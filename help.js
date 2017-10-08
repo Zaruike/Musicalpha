@@ -2,9 +2,6 @@ const commands = module.exports = {
     'help': `
 ~help [command]
    Brings up the command page. Pass a command for further information.`,
-    'cc': `
-~cc <voice channel> <mention>
-   Changes the mentioned user\'s voice channel to the given channel.`,
 
     'choose': `
 ~choose <arg1> | [arg2] ...
@@ -79,3 +76,4 @@ Requires a #music text channel.`,
    Options:
       [--reason <reason>] : Specifies a reason for kicking the user.`
 }
+

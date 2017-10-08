@@ -14,7 +14,7 @@ prompt.delimiter = '';
 const bot = new Discord.Client();
 
 bot.on('ready', () => {
-    console.log('CElestia starting.');
+    console.log(`${bot.user.username}  starting.`);
     console.log(`Serving ${bot.guilds.size} guilds.`);
 
     bot.user.setGame(config.prefix + 'help');
@@ -42,11 +42,16 @@ bot.login(config.token);
 
 function getCmdFunction(cmd) {
     const COMMANDS = {
+	    'ban': cmds.ban,
+        'choose': cmds.choose,
         'help': cmds.help,
+        'debug': cmds.debug,
+        'kick': cmds.kick,
+        'prune': cmds.prune,
         'music': music.processCommand,
-	'ban': cmds.ban
     }
     return COMMANDS[cmd] ? COMMANDS[cmd] : () => {};
 }
+
 
 
