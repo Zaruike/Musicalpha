@@ -1,0 +1,22 @@
+{
+  "name": "musicalpha",
+  "version": "1.0.0",
+  "description": "A personal Discord bot written using discord.js.",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^11.2.1",
+    "node-opus": "^0.2.7",
+    "prompt": "^1.0.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "strip-indent": "^2.0.0",
+    "youtube-dl": "^1.12.2",
+    "ytdl-core": "^0.18.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joris vidéo",
+  "license": "MIT"
+}
