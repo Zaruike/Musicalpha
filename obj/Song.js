@@ -17,8 +17,7 @@ class Song {
         if (this.type == 'youtube') {
             return ytdl(this.url, {
                 retries: 7,
-                highWaterMark: 32768,
-                filter: 'audioonly'
+                highWaterMark: 32768
             });
         }
         if (this.type == 'soundcloud')

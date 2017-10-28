@@ -19,8 +19,7 @@ function processCommand(msg) {
 
     //Add guild to the guild list.
     if (!guilds[msg.guild.id])
-        guilds[msg.guild.id] = new MusicPlayer(msg.guild);
-
+        guilds[msg.guild.id] = new MusicPlayer();
     let guild = guilds[msg.guild.id];
 
     let musicCmd = msg.content.split(/\s+/)[1];
