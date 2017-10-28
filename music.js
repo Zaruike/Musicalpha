@@ -82,13 +82,13 @@ const opts = {
 };
     ySearch(searchQuery, opts, function (err, results) {
         if (err) {
-            msg.channel.send(`Désolé, je ne trouve pas ta musique.`);
+            msg.channel.send(`Sorry, I couldn't find matching song.`);
             return console.log(err);
         }
         for (var y = 0; results[y].kind === 'youtube#channel'; y++);
         ytdl.getInfo(results[y].link, function (err, song) {
             if (err) {
-                msg.channel.send(`Désolé, je ne trouve pas ta musique.`);
+                msg.channel.send(`Sorry, I couldn't find matching song.`);
                 return console.log(err);
             }
             const author  = msg.author.username + '#' + msg.author.discriminator;
@@ -112,7 +112,7 @@ const processYoutube = {
     Processes a Youtube song, pushing it to the queue.
     @param {String} url The URL of the new song.
     */
-    song(msg, guild, url, time) {
+    song(msg, guild, url) {
         ytdl.getInfo(url, (err, song) => {
             if (err) {
                 console.log(err);
