@@ -45,8 +45,7 @@ class MusicPlayer {
             resolveVoiceChannel.call(this).then(() => {
                 let song = this.queue[0];
                 let stream = song.getStream();
-
-                this.musicChannel.send(`:notes: Now playing ${tool.wrap(song.title)}`);
+                this.musicChannel.send(`:notes: Now playing ${tool.wrap(song.title)} (\`${song.time}\`) requested by ${tool.wrap(song.author)}`);
                 this.changeStatus('playing');
                 this.dispatch = this.voiceConnection.playStream(stream, {
                     passes: 2,
@@ -134,7 +133,7 @@ class MusicPlayer {
             try {
                 let queueString = '';
                 for (let i = 0; i < this.queue.length && i < 15; i++)
-                    queueString += `${i + 1}. ${this.queue[i].title}\n`;
+                    queueString += `${i + 1}. ${this.queue[i].title} (\`${this.queue[i].time}\`) requested by ${this.queue[i].author}\n`;
                 if (this.queue.length > 15)
                     queueString += `\nand ${this.queue.length - 15} more.`;
                 msg.channel.send(queueString, {
@@ -240,4 +239,5 @@ class MusicPlayer {
 }
 
 module.exports = MusicPlayer;
+
 

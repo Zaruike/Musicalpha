@@ -3,7 +3,7 @@
 const config = require('./config.json');
 const tool = require('./tool.js');
 const ytdl = require('ytdl-core');
-
+const ySearch = require("youtube-search");
 const Song = require('./obj/Song.js');
 const MusicPlayer = require('./obj/MusicPlayer.js');
 
@@ -76,20 +76,31 @@ function processInput(msg, guild) {
 }
 
 function processSearch(msg, guild, searchQuery) {
-    searchQuery = 'ytsearch1:' + searchQuery;
-    youtubeDL.getInfo(searchQuery, ['--extract-audio'], (err, song) => {
+const opts = {
+    maxResults: 3,
+    key: config.youtube_api_key
+};
+    ySearch(searchQuery, opts, function (err, results) {
         if (err) {
-            msg.channel.send(`Sorry, I couldn't find matching song.`);
+            msg.channel.send(`Désolé, je ne trouve pas ta musique.`);
             return console.log(err);
         }
-        guild.queueSong(new Song(song.title, song.url, 'search'));
-
-        msg.channel.send(
-            `Enqueued ${tool.wrap(song.title.trim())} requested by ${tool.wrap(msg.author.username + '#' + msg.author.discriminator)} ${tool.inaHappy}`
+        for (var y = 0; results[y].kind === 'youtube#channel'; y++);
+        ytdl.getInfo(results[y].link, function (err, song) {
+            if (err) {
+                msg.channel.send(`Désolé, je ne trouve pas ta musique.`);
+                return console.log(err);
+            }
+            const author  = msg.author.username + '#' + msg.author.discriminator;
+            guild.queueSong(new Song(song.title, song.video_url, 'youtube', author, song.length_seconds));
+                    msg.channel.send(
+            `Enqueued ${tool.wrap(song.title.trim())} (\`${song.length_seconds}\`) requested by ${tool.wrap(author)}`
         );
 
         if (guild.status != 'playing')
             guild.playSong(msg, guild);
+    
+        });
     });
 }
 
@@ -101,7 +112,7 @@ const processYoutube = {
     Processes a Youtube song, pushing it to the queue.
     @param {String} url The URL of the new song.
     */
-    song(msg, guild, url) {
+    song(msg, guild, url, time) {
         ytdl.getInfo(url, (err, song) => {
             if (err) {
                 console.log(err);
@@ -109,9 +120,10 @@ const processYoutube = {
                 return;
             }
 
-            guild.queueSong(new Song(song.title, url, 'youtube'));
+console.log(guild.queueSong(new Song(song.title, url, 'youtube', '0:00')));
+            guild.queueSong(new Song(song.title, url, 'youtube', '0:00'));
             msg.channel.send(
-                `Enqueued ${tool.wrap(song.title.trim())} requested by ${tool.wrap(msg.author.username + '#' + msg.author.discriminator)} ${tool.inaHappy}`
+                `Enqueued ${tool.wrap(song.title.trim())} requested by ${tool.wrap(msg.author.username + '#' + msg.author.discriminator)}`
             );
             if (guild.status != 'playing') {
                 guild.playSong(msg);
@@ -180,7 +192,7 @@ const processYoutube = {
             }
 
             msg.channel.send(
-                `Enqueued ${tool.wrap(playlistItems.length)} songs from ${tool.wrap(playlistTitle)} requested by ${tool.wrap(msg.author.username + '#' + msg.author.discriminator)} ${tool.inaHappy}`
+                `Enqueued ${tool.wrap(playlistItems.length)} songs from ${tool.wrap(playlistTitle)} requested by ${tool.wrap(msg.author.username + '#' + msg.author.discriminator)}`
             );
 
             if (guild.status != 'playing') {
@@ -209,5 +221,6 @@ function timer() {
     }
 }
 setInterval(timer, 10000);
+
 
 
