@@ -6,8 +6,6 @@ const ytdl = require('ytdl-core');
 const ySearch = require("youtube-search");
 const Song = require('./obj/Song.js');
 const MusicPlayer = require('./obj/MusicPlayer.js');
-
-const youtubeDL = require('youtube-dl');
 const rp = require('request-promise');
 
 module.exports.processCommand = processCommand;
@@ -65,7 +63,7 @@ function processInput(msg, guild) {
             } else if (url.search(/v=(\S+?)(&|\s|$|#)/)) { //Video.
                 processYoutube.song(msg, guild, url);
             } else {
-                msg.channel.send(`Invalid Youtube link! ${inaBaka}`);
+                msg.channel.send(`Invalid Youtube link!`);
             }
         } else if (url.search('soundcloud.com')) { //Soundcloud.
             msg.channel.send('Sorry, Soundcloud music isn\'nt functional right now.');
@@ -92,9 +90,9 @@ const opts = {
                 return console.log(err);
             }
             const author  = msg.author.username + '#' + msg.author.discriminator;
-            guild.queueSong(new Song(song.title, song.video_url, 'youtube', author, song.length_seconds));
+            guild.queueSong(new Song(song.title, song.video_url, 'youtube',  author, time(song.length_seconds), song.iurlmq));
                     msg.channel.send(
-            `Enqueued ${tool.wrap(song.title.trim())} (\`${song.length_seconds}\`) requested by ${tool.wrap(author)}`
+            `Enqueued ${tool.wrap(song.title.trim())} (\`${time(song.length_seconds)}\`) requested by ${tool.wrap(author)}`
         );
 
         if (guild.status != 'playing')
@@ -119,11 +117,11 @@ const processYoutube = {
                 msg.channel.send(`Sorry I couldn't queue your song.`);
                 return;
             }
-
-console.log(guild.queueSong(new Song(song.title, url, 'youtube', '0:00')));
-            guild.queueSong(new Song(song.title, url, 'youtube', '0:00'));
+            const author  = msg.author.username + '#' + msg.author.discriminator;
+            console.log(song);
+            guild.queueSong(new Song(song.title, url, 'youtube', author,time(song.length_seconds), song.iurlmq));
             msg.channel.send(
-                `Enqueued ${tool.wrap(song.title.trim())} requested by ${tool.wrap(msg.author.username + '#' + msg.author.discriminator)}`
+                `Enqueued ${tool.wrap(song.title.trim())} (\`${time(song.length_seconds)}\`) requested by ${tool.wrap(author)}`
             );
             if (guild.status != 'playing') {
                 guild.playSong(msg);
@@ -143,11 +141,11 @@ console.log(guild.queueSong(new Song(song.title, url, 'youtube', '0:00')));
             .catch(err => {
                 console.log(err);
                 msg.channel.send(
-                    `${tool.inaError} Sorry, I couldn't add your playlist to the queue. Try again later.`
+                    `Sorry, I couldn't add your playlist to the queue. Try again later.`
                 )
             });
 
-        async function getPlaylistName() {
+        async function getPlaylistName() {  
             let options = {
                 url: `${youtubeApiUrl}playlists?id=${playlistId}&part=snippet&key=${config.youtube_api_key}`
             }
@@ -164,7 +162,7 @@ console.log(guild.queueSong(new Song(song.title, url, 'youtube', '0:00')));
                 '';
 
             let options = {
-                url: `${youtubeApiUrl}playlistItems?playlistId=${playlistId}${pageToken}&part=snippet&fields=nextPageToken,items(snippet(title,resourceId/videoId))&maxResults=50&key=${config.youtube_api_key}`
+                url: `${youtubeApiUrl}playlistItems?playlistId=${playlistId}${pageToken}&part=snippet,contentDetails&fields=nextPageToken,items(snippet(title,resourceId/videoId,thumbnails),contentDetails)&maxResults=50&key=${config.youtube_api_key}`
             }
 
             let body = await rp(options);
@@ -182,12 +180,12 @@ console.log(guild.queueSong(new Song(song.title, url, 'youtube', '0:00')));
 
         async function addToQueue(playlistTitle, playlistItems) {
             let queueLength = guild.queue.length;
-
+            const author  = msg.author.username + '#' + msg.author.discriminator;
             for (let i = 0; i < playlistItems.length; i++) {
                 let song = new Song(
                     playlistItems[i].snippet.title,
                     `https://www.youtube.com/watch?v=${playlistItems[i].snippet.resourceId.videoId}`,
-                    'youtube');
+                    'youtube', author, "0:00", (playlistItems[i].snippet.thumbnails.medium.url || playlistItems[i].snippet.thumbnails.default.url));
                 guild.queueSong(song, i + queueLength);
             }
 
@@ -201,6 +199,24 @@ console.log(guild.queueSong(new Song(song.title, url, 'youtube', '0:00')));
         }
     },
 }
+/*
+Parser time for video.
+ */
+
+function time(timesec){
+        let upTimeOutput = "";
+        if (timesec<60) {
+            upTimeOutput = `${timesec}s`;
+        } else if (timesec<3600) {
+            upTimeOutput = `${Math.floor(timesec/60)}:${timesec%60}`;
+        } else if (timesec<86400) {
+            upTimeOutput = `${Math.floor(timesec/3600)}:${Math.floor(timesec%3600/60)}:${timesec%3600%60}`;
+        } else if (timesec<604800) {
+            upTimeOutput = `${Math.floor(timesec/86400)}:${Math.floor(timesec%86400/3600)}:${Math.floor(timesec%86400%3600/60)}:${timesec%86400%3600%60}`;
+        }
+        return upTimeOutput;
+}
+
 
 /*
 Timer for inactivity. Leave voice channel after inactivity timer expires.

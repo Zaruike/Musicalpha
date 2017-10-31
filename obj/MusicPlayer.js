@@ -45,7 +45,23 @@ class MusicPlayer {
             resolveVoiceChannel.call(this).then(() => {
                 let song = this.queue[0];
                 let stream = song.getStream();
-                this.musicChannel.send(`:notes: Now playing ${tool.wrap(song.title)} (\`${song.time}\`) requested by ${tool.wrap(song.author)}`);
+                console.log(song.thumbnail);
+                this.musicChannel.send({embed: {
+                    color: 3447003,
+                    fields: [{
+                        name: `:notes: Now playing `,
+                        value: `[${song.title}]`+`(${song.url}) (\`${song.time}\`) requested by **${song.author}**`
+                      }],
+                    thumbnail: {
+                        url: `${song.thumbnail}`
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                      icon_url: msg.author.avatarURL,
+                      text: "© Silver Crow"
+                    }
+                  }
+                });
                 this.changeStatus('playing');
                 this.dispatch = this.voiceConnection.playStream(stream, {
                     passes: 2,
@@ -162,10 +178,26 @@ class MusicPlayer {
     Displays the currently playing song.
     */
     nowPlaying(msg) {
-        if (this.queue.length > 0)
-            msg.channel.send(`:notes: Now playing ${tool.wrap(this.queue[0].title)}.`);
-        else
+        if (this.queue.length > 0){
+            msg.channel.send({embed: {
+                    color: 3447003,
+                    fields: [{
+                        name: `:notes: Now playing `,
+                        value: `[${this.queue[0].title}]`+`(${this.queue[0].url}) (\`${this.queue[0].time}\`) requested by **${this.queue[0].author}**`
+                      }],
+                    thumbnail: {
+                        url: `${this.queue[0].thumbnail}`
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                      icon_url: msg.author.avatarURL,
+                      text: "© Silver Crow"
+                    }
+                  }
+                });
+        }else{
             msg.channel.send('Nothing is playing right now.');
+        }
     }
 
     /*
@@ -239,5 +271,6 @@ class MusicPlayer {
 }
 
 module.exports = MusicPlayer;
+
 
 

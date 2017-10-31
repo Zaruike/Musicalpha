@@ -16,7 +16,7 @@ module.exports = {
 }
 
 
-function debug(msg){
+function debug(msg, bot){
 
  let upTime = Math.round(os.uptime());
  let upTime1 = Math.round(process.uptime());
@@ -285,6 +285,7 @@ function prune(msg){
         }
     }
 }
+
 
 
 

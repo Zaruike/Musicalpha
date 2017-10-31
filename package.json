@@ -10,7 +10,8 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "strip-indent": "^2.0.0",
-    "youtube-dl": "^1.12.2",
+    "util": "^0.10.3",
+    "youtube-search": "^1.0.10",
     "ytdl-core": "^0.18.0"
   },
   "devDependencies": {},
